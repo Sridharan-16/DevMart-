@@ -1,4 +1,5 @@
 import { useState } from "react";
+import React from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -33,10 +34,11 @@ export default function AuthPage() {
   const [, setLocation] = useLocation();
 
   // Redirect if already logged in
-  if (user) {
-    setLocation("/");
-    return null;
-  }
+  React.useEffect(() => {
+    if (user) {
+      setLocation("/");
+    }
+  }, [user, setLocation]);
 
   const loginForm = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),

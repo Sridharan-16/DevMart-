@@ -22,6 +22,7 @@ export default function ProjectDetails() {
 
   const { data: project, isLoading } = useQuery({
     queryKey: ["/api/projects", id],
+    enabled: !!id,
   });
 
   const { data: purchaseData } = useQuery({
@@ -38,7 +39,7 @@ export default function ProjectDetails() {
     mutationFn: async (data: { content: string }) => {
       const res = await apiRequest("POST", "/api/messages", {
         projectId: parseInt(id!),
-        receiverId: project.seller.id,
+        receiverId: project?.seller?.id,
         content: data.content,
       });
       return res.json();
@@ -55,7 +56,7 @@ export default function ProjectDetails() {
     mutationFn: async (data: { reason: string; description: string }) => {
       const res = await apiRequest("POST", "/api/reports", {
         projectId: parseInt(id!),
-        sellerId: project.seller.id,
+        sellerId: project?.seller?.id,
         reason: data.reason,
         description: data.description,
       });
@@ -104,7 +105,7 @@ export default function ProjectDetails() {
   }
 
   const isPurchased = purchaseData?.purchased;
-  const isOwner = user?.id === project.seller.id;
+  const isOwner = user?.id === project?.seller?.id;
 
   const handleContactSeller = () => {
     if (!user) {
