@@ -41,5 +41,5 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/devmart.git
+   git clone https://github.com/Sridharan-16/Devmart-.git
    cd devmart
