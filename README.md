@@ -1,8 +1,6 @@
 # 🛒 DevMart – The Developer Code Marketplace
 
-**DevMart** is a modern, full-stack code marketplace where developers can **upload**, **sell**, and **buy** ready-to-use code snippets, components, tools, and full-stack applications. Built for creators who want to monetize their work and for coders who want production-ready solutions.
-
-![DevMart Banner](https://your-image-url-if-any.com)
+**DevMart** is a modern, full-stack code marketplace where developers can **upload**, **sell**, and **buy** ready-to-use code snippets, tools, and full-stack applications. Built for creators who want to monetize their work and coders who need quick, reliable code solutions.
 
 ---
 
