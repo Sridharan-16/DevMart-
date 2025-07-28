@@ -81,7 +81,7 @@ export default function AuthPage() {
           <div className="text-center">
             <div className="flex items-center justify-center mb-4">
               <Code className="h-8 w-8 text-primary-600 mr-2" />
-              <h1 className="text-2xl font-bold text-slate-900">CodeMarket</h1>
+              <h1 className="text-2xl font-bold text-black">DevMart</h1>
             </div>
             <p className="text-slate-600">Join the verified code marketplace</p>
           </div>

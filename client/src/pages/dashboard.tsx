@@ -38,7 +38,7 @@ export default function Dashboard() {
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-slate-900 mb-2">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-black mb-2">Dashboard</h1>
           <p className="text-slate-600">Manage your projects and purchases</p>
         </div>
 
@@ -57,8 +57,8 @@ export default function Dashboard() {
                     <div className="flex items-center">
                       <Package className="h-8 w-8 text-blue-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-slate-600">Projects</p>
-                        <p className="text-2xl font-bold text-slate-900">
+                        <p className="text-sm font-medium text-black">Projects</p>
+                        <p className="text-2xl font-bold text-black">
                           {sellerData?.projects?.length || 0}
                         </p>
                       </div>
@@ -70,8 +70,8 @@ export default function Dashboard() {
                     <div className="flex items-center">
                       <DollarSign className="h-8 w-8 text-green-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-slate-600">Total Earnings</p>
-                        <p className="text-2xl font-bold text-slate-900">
+                        <p className="text-sm font-medium text-black">Total Earnings</p>
+                        <p className="text-2xl font-bold text-black">
                           ${sellerData?.projects?.reduce((sum: number, p: any) => sum + (parseFloat(p.price) * p.downloads), 0).toFixed(2) || "0.00"}
                         </p>
                       </div>
@@ -83,8 +83,8 @@ export default function Dashboard() {
                     <div className="flex items-center">
                       <Download className="h-8 w-8 text-purple-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-slate-600">Downloads</p>
-                        <p className="text-2xl font-bold text-slate-900">
+                        <p className="text-sm font-medium text-black">Downloads</p>
+                        <p className="text-2xl font-bold text-black">
                           {sellerData?.projects?.reduce((sum: number, p: any) => sum + p.downloads, 0) || 0}
                         </p>
                       </div>
@@ -96,8 +96,8 @@ export default function Dashboard() {
                     <div className="flex items-center">
                       <Star className="h-8 w-8 text-yellow-600" />
                       <div className="ml-3">
-                        <p className="text-sm font-medium text-slate-600">Avg Rating</p>
-                        <p className="text-2xl font-bold text-slate-900">
+                        <p className="text-sm font-medium text-black">Avg Rating</p>
+                        <p className="text-2xl font-bold text-black">
                           {sellerData?.projects?.length 
                             ? (sellerData.projects.reduce((sum: number, p: any) => sum + parseFloat(p.rating), 0) / sellerData.projects.length).toFixed(1)
                             : "0.0"
@@ -111,7 +111,7 @@ export default function Dashboard() {
 
               {/* Upload Button */}
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold text-slate-900">Your Projects</h2>
+                <h2 className="text-xl font-semibold text-black">Your Projects</h2>
                 <Button onClick={() => setShowUploadModal(true)}>
                   <Plus className="w-4 h-4 mr-2" />
                   Upload Project
@@ -152,15 +152,15 @@ export default function Dashboard() {
                             )}
                             <div>
                               <div className="flex items-center gap-2 mb-1">
-                                <h3 className="font-semibold text-slate-900">{project.title}</h3>
+                                <h3 className="font-semibold text-black">{project.title}</h3>
                                 {project.verified ? (
                                   <Badge className="bg-success-100 text-success-700">Verified</Badge>
                                 ) : (
                                   <Badge variant="secondary">Pending</Badge>
                                 )}
                               </div>
-                              <p className="text-slate-600 text-sm">{project.description.slice(0, 100)}...</p>
-                              <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                              <p className="text-black text-sm">{project.description.slice(0, 100)}...</p>
+                              <div className="flex items-center gap-4 mt-2 text-xs text-black">
                                 <span>${project.price}</span>
                                 <span>{project.downloads} downloads</span>
                                 <span>★ {project.rating}</span>
@@ -184,8 +184,8 @@ export default function Dashboard() {
                 <Card>
                   <CardContent className="p-6 text-center">
                     <Package className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">No projects yet</h3>
-                    <p className="text-slate-600 mb-4">Upload your first project to start selling</p>
+                    <h3 className="text-lg font-semibold text-black mb-2">No projects yet</h3>
+                    <p className="text-black mb-4">Upload your first project to start selling</p>
                     <Button onClick={() => setShowUploadModal(true)}>
                       <Plus className="w-4 h-4 mr-2" />
                       Upload Project
@@ -198,7 +198,7 @@ export default function Dashboard() {
 
           {showBuyerTab && (
             <TabsContent value="buyer" className="space-y-6">
-              <h2 className="text-xl font-semibold text-slate-900">Your Purchases</h2>
+              <h2 className="text-xl font-semibold text-black">Your Purchases</h2>
               
               {buyerLoading ? (
                 <div className="space-y-4">
@@ -232,9 +232,9 @@ export default function Dashboard() {
                               />
                             )}
                             <div>
-                              <h3 className="font-semibold text-slate-900">{purchase.project?.title}</h3>
-                              <p className="text-slate-600 text-sm">{purchase.project?.description?.slice(0, 100)}...</p>
-                              <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                              <h3 className="font-semibold text-black">{purchase.project?.title}</h3>
+                              <p className="text-black text-sm">{purchase.project?.description?.slice(0, 100)}...</p>
+                              <div className="flex items-center gap-4 mt-2 text-xs text-black">
                                 <span>Purchased ${purchase.amount}</span>
                                 <span>{new Date(purchase.createdAt).toLocaleDateString()}</span>
                               </div>
@@ -263,8 +263,8 @@ export default function Dashboard() {
                 <Card>
                   <CardContent className="p-6 text-center">
                     <Download className="w-12 h-12 text-slate-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-slate-900 mb-2">No purchases yet</h3>
-                    <p className="text-slate-600 mb-4">Browse the marketplace to find amazing projects</p>
+                    <h3 className="text-lg font-semibold text-black mb-2">No purchases yet</h3>
+                    <p className="text-black mb-4">Browse the marketplace to find amazing projects</p>
                     <Link href="/marketplace">
                       <Button>
                         Explore Marketplace

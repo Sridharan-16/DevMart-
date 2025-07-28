@@ -23,28 +23,28 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary-600 to-violet-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6 text-black">
             Buy & Sell <span className="text-yellow-300">Verified</span> Code Projects
           </h1>
-          <p className="text-xl md:text-2xl mb-8 text-blue-100 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl mb-8 text-gray-900 max-w-3xl mx-auto">
             A marketplace where every project is automatically tested and verified before listing. 
             Get quality code that actually works.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/marketplace">
-              <Button size="lg" variant="secondary" className="bg-white text-primary-600 hover:bg-slate-50">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
+            <Link href="/marketplace" className="flex-1">
+              <Button size="lg" variant="primary" className="w-full bg-primary-600 text-white hover:bg-primary-700 transition-transform duration-200 ease-in-out hover:scale-105">
                 Browse Projects
               </Button>
             </Link>
             {user ? (
-              <Link href="/dashboard">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary-600">
+              <Link href="/dashboard" className="flex-1">
+                <Button size="lg" variant="primary" className="w-full bg-primary-600 text-white hover:bg-primary-700 transition-transform duration-200 ease-in-out hover:scale-105">
                   Start Selling
                 </Button>
               </Link>
             ) : (
-              <Link href="/auth">
-                <Button size="lg" variant="outline" className="border-white text-white hover:bg-white hover:text-primary-600">
+              <Link href="/auth" className="flex-1">
+                <Button size="lg" variant="primary" className="w-full bg-primary-600 text-white hover:bg-primary-700 transition-transform duration-200 ease-in-out hover:scale-105">
                   Start Selling
                 </Button>
               </Link>
@@ -124,7 +124,7 @@ export default function HomePage() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Why Choose CodeMarket?</h2>
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">Why Choose DevMart?</h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
               Every project is automatically verified to ensure quality and functionality
             </p>
@@ -186,7 +186,7 @@ export default function HomePage() {
             <div>
               <h3 className="text-white text-lg font-semibold mb-4 flex items-center">
                 <Code className="mr-2" />
-                CodeMarket
+                DevMart
               </h3>
               <p className="text-slate-400 mb-4">The premier marketplace for verified code projects.</p>
             </div>
@@ -219,7 +219,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-slate-700 mt-8 pt-8 text-center">
-            <p>&copy; 2024 CodeMarket. All rights reserved.</p>
+            <p>&copy; 2024 DevMart. All rights reserved.</p>
           </div>
         </div>
       </footer>

@@ -68,20 +68,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/projects", requireAuth, upload.fields([
-    { name: 'codeFile', maxCount: 1 },
-    { name: 'previewImage', maxCount: 1 }
-  ]), async (req, res) => {
+  app.post("/api/projects", requireAuth, upload.any(), async (req, res) => {
     try {
-      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      console.log("🔥 Project upload hit");
+      const files = req.files as Express.Multer.File[];
+      console.log("📁 Files received:", files);
+      console.log("📄 Body received:", req.body);
+
+      // If fieldnames are 'files', use first as codeFile, second as previewImage
+      let codeFile: Express.Multer.File | undefined;
+      let previewImage: Express.Multer.File | undefined;
+      if (files.length > 0 && files[0].fieldname === 'files') {
+        codeFile = files[0];
+        previewImage = files[1];
+      } else {
+        codeFile = files.find(f => f.fieldname === 'codeFile');
+        previewImage = files.find(f => f.fieldname === 'previewImage');
+      }
+
+      if (!codeFile) {
+        return res.status(400).json({ message: "Code file is required" });
+      }
+
       const projectData = insertProjectSchema.parse({
         ...req.body,
         sellerId: req.user!.id,
         technologies: req.body.technologies ? req.body.technologies.split(',').map((t: string) => t.trim()) : [],
-        codeFileUrl: files?.['codeFile'] ? `/uploads/${files['codeFile'][0].filename}` : '',
-        previewImageUrl: files?.['previewImage'] ? `/uploads/${files['previewImage'][0].filename}` : null,
+        codeFileUrl: `/uploads/${codeFile.filename}`,
+        previewImageUrl: previewImage ? `/uploads/${previewImage.filename}` : null,
       });
 
+      console.log("Creating project with data:", projectData);
       const project = await storage.createProject(projectData);
       
       // Mock verification process - in real app, this would run code verification
@@ -89,8 +106,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         await storage.verifyProject(project.id);
       }, 5000);
 
+      console.log("Project created successfully:", project.id);
       res.status(201).json(project);
     } catch (error: any) {
+      console.error("Upload error:", error);
       res.status(400).json({ message: error.message });
     }
   });

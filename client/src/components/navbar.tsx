@@ -41,7 +41,7 @@ export default function Navbar() {
             <Link href="/" className="flex-shrink-0">
               <h1 className="text-2xl font-bold text-primary-600 flex items-center">
                 <Code className="mr-2 h-6 w-6" />
-                CodeMarket
+                DevMart
               </h1>
             </Link>
           </div>

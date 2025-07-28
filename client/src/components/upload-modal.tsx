@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { insertProjectSchema } from "@shared/schema";
 import { z } from "zod";
 import { Upload, CloudUpload } from "lucide-react";
+import { useDropzone } from "react-dropzone";
 
 const uploadSchema = insertProjectSchema.extend({
   technologies: z.string().optional(),
@@ -30,10 +31,16 @@ interface UploadModalProps {
 
 export default function UploadModal({ onClose }: UploadModalProps) {
   const { toast } = useToast();
-  const [codeFile, setCodeFile] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<File | null>(null);
+  const [files, setFiles] = useState<File[]>([]);
 
-  const form = useForm<UploadFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+    trigger
+  } = useForm<UploadFormData>({
     resolver: zodResolver(uploadSchema),
     defaultValues: {
       title: "",
@@ -41,33 +48,37 @@ export default function UploadModal({ onClose }: UploadModalProps) {
       price: "",
       category: "",
       technologies: "",
-      terms: false,
-    },
+      terms: false
+    }
   });
+
+  // Debug: log form errors on every render
+  console.log("❗Form Errors:", errors);
+
+  const onDrop = (acceptedFiles: File[]) => {
+    setFiles(prev => [...prev, ...acceptedFiles]);
+  };
+
+  const removeFile = (file: File) => {
+    setFiles(prev => prev.filter(f => f !== file));
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop, multiple: true });
 
   const uploadMutation = useMutation({
     mutationFn: async (data: UploadFormData) => {
       const formData = new FormData();
-      
-      // Add all form fields
       formData.append("title", data.title);
       formData.append("description", data.description);
       formData.append("price", data.price);
       formData.append("category", data.category);
       formData.append("technologies", data.technologies || "");
-      
-      // Add files
-      if (codeFile) {
-        formData.append("codeFile", codeFile);
-      }
-      if (previewImage) {
-        formData.append("previewImage", previewImage);
-      }
+      files.forEach(file => formData.append("files", file));
 
       const res = await fetch("/api/projects", {
         method: "POST",
         body: formData,
-        credentials: "include",
+        credentials: "include"
       });
 
       if (!res.ok) {
@@ -79,8 +90,8 @@ export default function UploadModal({ onClose }: UploadModalProps) {
     },
     onSuccess: () => {
       toast({
-        title: "Project uploaded!",
-        description: "Your project is being verified and will be available soon.",
+        title: "✅ Project uploaded!",
+        description: "Your project is being verified and will be available soon."
       });
       queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
       queryClient.invalidateQueries({ queryKey: ["/api/dashboard/seller"] });
@@ -88,24 +99,39 @@ export default function UploadModal({ onClose }: UploadModalProps) {
     },
     onError: (error: any) => {
       toast({
-        title: "Upload failed",
+        title: "❌ Upload failed",
         description: error.message,
-        variant: "destructive",
+        variant: "destructive"
       });
-    },
+    }
   });
 
-  const onSubmit = (data: UploadFormData) => {
-    if (!codeFile) {
+  const onSubmit = async (data: UploadFormData) => {
+    console.log("🚀 Form Submitted:", data); // Debug log
+    if (files.length === 0) {
       toast({
-        title: "Code file required",
-        description: "Please select a ZIP file containing your project code.",
-        variant: "destructive",
+        title: "File required",
+        description: "Please select at least one file to upload.",
+        variant: "destructive"
       });
       return;
     }
+    try {
+      await uploadMutation.mutateAsync(data);
+    } catch (error) {
+      uploadMutation.reset();
+    }
+  };
 
-    uploadMutation.mutate(data);
+  // Handler for invalid form
+  const onInvalid = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    toast({
+      title: "Please fix the form errors",
+      description: "Some fields are invalid or missing.",
+      variant: "destructive",
+    });
+    console.warn("⚠️ Form validation failed:", errors);
   };
 
   return (
@@ -113,22 +139,32 @@ export default function UploadModal({ onClose }: UploadModalProps) {
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Upload New Project</DialogTitle>
+          <DialogDescription>
+            Fill in your project details and upload your files (like GitHub).
+          </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit, () => {
+          toast({
+            title: "Please fix the form errors",
+            description: "Some fields are invalid or missing.",
+            variant: "destructive",
+          });
+          console.warn("⚠️ Form validation failed:", errors);
+        })} className="space-y-6">
           <div className="grid grid-cols-1 gap-6">
-            {/* Project Details */}
             <div>
-              <Label htmlFor="title">Project Title</Label>
-              <Input
-                id="title"
-                placeholder="My Awesome Project"
-                {...form.register("title")}
+              <Label htmlFor="title" className="flex items-center gap-1">
+                Project Title <span className="text-red-500">*</span>
+              </Label>
+              <Input 
+                id="title" 
+                placeholder="My Project" 
+                {...register("title")}
+                className={`text-black ${errors.title ? "border-red-500 text-red-600" : ""}`} 
               />
-              {form.formState.errors.title && (
-                <p className="text-sm text-red-600 mt-1">
-                  {form.formState.errors.title.message}
-                </p>
+              {errors.title && (
+                <p className="text-red-600 text-sm mt-1">{errors.title.message}</p>
               )}
             </div>
 
@@ -138,11 +174,11 @@ export default function UploadModal({ onClose }: UploadModalProps) {
                 id="description"
                 rows={4}
                 placeholder="Describe your project..."
-                {...form.register("description")}
+                {...register("description")}
               />
-              {form.formState.errors.description && (
+              {errors.description && (
                 <p className="text-sm text-red-600 mt-1">
-                  {form.formState.errors.description.message}
+                  {errors.description.message}
                 </p>
               )}
             </div>
@@ -150,7 +186,7 @@ export default function UploadModal({ onClose }: UploadModalProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="category">Category</Label>
-                <Select onValueChange={(value) => form.setValue("category", value)}>
+                <Select onValueChange={(value) => setValue("category", value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
@@ -162,9 +198,9 @@ export default function UploadModal({ onClose }: UploadModalProps) {
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
-                {form.formState.errors.category && (
+                {errors.category && (
                   <p className="text-sm text-red-600 mt-1">
-                    {form.formState.errors.category.message}
+                    {errors.category.message}
                   </p>
                 )}
               </div>
@@ -176,11 +212,11 @@ export default function UploadModal({ onClose }: UploadModalProps) {
                   min="1"
                   step="0.01"
                   placeholder="99.00"
-                  {...form.register("price")}
+                  {...register("price")}
                 />
-                {form.formState.errors.price && (
+                {errors.price && (
                   <p className="text-sm text-red-600 mt-1">
-                    {form.formState.errors.price.message}
+                    {errors.price.message}
                   </p>
                 )}
               </div>
@@ -193,14 +229,17 @@ export default function UploadModal({ onClose }: UploadModalProps) {
                 <input
                   type="file"
                   accept=".zip"
-                  onChange={(e) => setCodeFile(e.target.files?.[0] || null)}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) setFiles(prev => [...prev, file]);
+                  }}
                   className="hidden"
                   id="codeFile"
                 />
                 <label htmlFor="codeFile" className="cursor-pointer">
                   <CloudUpload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                   <p className="text-slate-600">
-                    {codeFile ? codeFile.name : "Click to upload ZIP file"}
+                    {files.length > 0 ? files[0].name : "Click to upload ZIP file"}
                   </p>
                 </label>
               </div>
@@ -212,14 +251,17 @@ export default function UploadModal({ onClose }: UploadModalProps) {
                 <input
                   type="file"
                   accept="image/*,video/*"
-                  onChange={(e) => setPreviewImage(e.target.files?.[0] || null)}
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) setFiles(prev => [...prev, file]);
+                  }}
                   className="hidden"
                   id="previewImage"
                 />
                 <label htmlFor="previewImage" className="cursor-pointer">
                   <Upload className="w-8 h-8 text-slate-400 mx-auto mb-2" />
                   <p className="text-slate-600">
-                    {previewImage ? previewImage.name : "Click to upload preview"}
+                    {files.length > 1 ? files[1].name : "Click to upload preview"}
                   </p>
                 </label>
               </div>
@@ -231,7 +273,7 @@ export default function UploadModal({ onClose }: UploadModalProps) {
               <Input
                 id="technologies"
                 placeholder="React, Node.js, MongoDB (comma separated)"
-                {...form.register("technologies")}
+                {...register("technologies")}
               />
             </div>
 
@@ -239,22 +281,25 @@ export default function UploadModal({ onClose }: UploadModalProps) {
             <div className="flex items-start space-x-2">
               <Checkbox
                 id="terms"
-                checked={form.watch("terms")}
-                onCheckedChange={(checked) => form.setValue("terms", !!checked)}
+                checked={watch("terms")}
+                onCheckedChange={(val) => {
+                  setValue("terms", !!val);
+                  trigger("terms");
+                }}
+                className={errors.terms ? "border-red-500" : ""}
               />
-              <Label htmlFor="terms" className="text-sm leading-relaxed">
-                I confirm that this code is my original work and I have the right to sell it. 
-                I understand that it will be automatically verified before listing.
-              </Label>
+              <div className="flex flex-col">
+                <Label htmlFor="terms" className="flex items-center gap-1">
+                  I agree to the terms <span className="text-red-500">*</span>
+                </Label>
+                {errors.terms && (
+                  <p className="text-red-600 text-sm mt-1">{errors.terms.message}</p>
+                )}
+              </div>
             </div>
-            {form.formState.errors.terms && (
-              <p className="text-sm text-red-600">
-                {form.formState.errors.terms.message}
-              </p>
-            )}
           </div>
 
-          <div className="flex space-x-3">
+          <div className="flex gap-3">
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
               Cancel
             </Button>

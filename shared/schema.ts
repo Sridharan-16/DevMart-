@@ -1,6 +1,5 @@
 import { pgTable, text, serial, integer, boolean, timestamp, decimal, jsonb } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const users = pgTable("users", {
@@ -146,41 +145,54 @@ export const reportsRelations = relations(reports, ({ one }) => ({
 }));
 
 // Insert schemas
-export const insertUserSchema = createInsertSchema(users).omit({
-  id: true,
-  createdAt: true,
-  stripeCustomerId: true,
+export const insertUserSchema = z.object({
+  username: z.string(),
+  email: z.string().email(),
+  password: z.string(),
+  fullName: z.string(),
+  role: z.enum(["buyer", "seller", "both"]),
+  stripeCustomerId: z.string().nullable().optional(),
 });
 
-export const insertProjectSchema = createInsertSchema(projects).omit({
-  id: true,
-  downloads: true,
-  rating: true,
-  reviewCount: true,
-  verified: true,
-  createdAt: true,
-  updatedAt: true,
+export const insertProjectSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  price: z.string(),
+  category: z.string(),
+  technologies: z.array(z.string()),
+  sellerId: z.number().optional(),
+  previewImageUrl: z.string().nullable().optional(),
+  codeFileUrl: z.string().optional(),
 });
 
-export const insertPurchaseSchema = createInsertSchema(purchases).omit({
-  id: true,
-  createdAt: true,
+export const insertPurchaseSchema = z.object({
+  buyerId: z.number(),
+  projectId: z.number(),
+  amount: z.string(),
+  stripePaymentIntentId: z.string().nullable().optional(),
 });
 
-export const insertReviewSchema = createInsertSchema(reviews).omit({
-  id: true,
-  createdAt: true,
+export const insertReviewSchema = z.object({
+  projectId: z.number(),
+  buyerId: z.number(),
+  rating: z.number(),
+  comment: z.string().nullable().optional(),
 });
 
-export const insertMessageSchema = createInsertSchema(messages).omit({
-  id: true,
-  createdAt: true,
+export const insertMessageSchema = z.object({
+  projectId: z.number(),
+  senderId: z.number(),
+  receiverId: z.number(),
+  content: z.string(),
 });
 
-export const insertReportSchema = createInsertSchema(reports).omit({
-  id: true,
-  status: true,
-  createdAt: true,
+export const insertReportSchema = z.object({
+  projectId: z.number(),
+  reporterId: z.number(),
+  sellerId: z.number(),
+  reason: z.string(),
+  description: z.string().nullable().optional(),
+  status: z.enum(["pending", "resolved", "dismissed"]),
 });
 
 // Types

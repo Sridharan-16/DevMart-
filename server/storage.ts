@@ -117,7 +117,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getProjects(filters?: { category?: string; sellerId?: number }): Promise<any[]> {
-    let baseQuery = db
+    const conditions = [];
+    if (filters?.category) {
+      conditions.push(eq(projects.category, filters.category));
+    }
+    if (filters?.sellerId) {
+      conditions.push(eq(projects.sellerId, filters.sellerId));
+    }
+
+    const baseQuery = db
       .select({
         id: projects.id,
         title: projects.title,
@@ -138,26 +146,31 @@ export class DatabaseStorage implements IStorage {
         },
       })
       .from(projects)
-      .leftJoin(users, eq(projects.sellerId, users.id))
-      .orderBy(desc(projects.createdAt));
+      .leftJoin(users, eq(projects.sellerId, users.id));
 
-    let conditions = [];
-    if (filters?.category) {
-      conditions.push(eq(projects.category, filters.category));
-    }
-    if (filters?.sellerId) {
-      conditions.push(eq(projects.sellerId, filters.sellerId));
-    }
-    
     if (conditions.length > 0) {
-      baseQuery = baseQuery.where(conditions.length === 1 ? conditions[0] : and(...conditions));
+      return await baseQuery
+        .where(conditions.length === 1 ? conditions[0] : and(...conditions))
+        .orderBy(desc(projects.createdAt));
+    } else {
+      return await baseQuery.orderBy(desc(projects.createdAt));
     }
-
-    return await baseQuery;
   }
 
   async createProject(project: InsertProject): Promise<Project> {
-    const [newProject] = await db.insert(projects).values([project]).returning();
+    // Only include valid fields for the DB insert
+    const dbProject = {
+      title: project.title,
+      description: project.description,
+      price: project.price,
+      category: project.category,
+      technologies: project.technologies,
+      sellerId: project.sellerId,
+      previewImageUrl: project.previewImageUrl,
+      codeFileUrl: project.codeFileUrl,
+      codeFileData: project.codeFileData,
+    };
+    const [newProject] = await db.insert(projects).values(dbProject).returning();
     return newProject;
   }
 

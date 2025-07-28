@@ -161,32 +161,38 @@ export default function ProjectDetails() {
                 <Badge variant="secondary">{project.category}</Badge>
               </div>
               
-              <h1 className="text-3xl font-bold text-slate-900 mb-4">{project.title}</h1>
+              <h1 className="text-3xl font-bold text-blue-800 mb-4">DevMart</h1>
               
-              <div className="flex items-center gap-6 text-sm text-slate-600">
+              <div className="flex items-center gap-6 text-sm text-gray-700">
                 <div className="flex items-center gap-2">
                   <Avatar className="w-8 h-8">
                     <AvatarFallback>
-                      {project.seller.fullName?.charAt(0) || project.seller.username?.charAt(0)}
+                      {project.seller
+                        ? (project.seller.fullName?.charAt(0) || project.seller.username?.charAt(0))
+                        : "?"}
                     </AvatarFallback>
                   </Avatar>
-                  <span className="font-medium text-slate-900">{project.seller.fullName || project.seller.username}</span>
+                  <span className="font-medium text-gray-900">
+                    {project.seller
+                      ? (project.seller.fullName || project.seller.username)
+                      : "Unknown Seller"}
+                  </span>
                 </div>
                 
                 <div className="flex items-center gap-1">
                   <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span className="font-medium">{project.rating}</span>
-                  <span>({project.reviewCount} reviews)</span>
+                  <span className="font-medium text-gray-900">{project.rating}</span>
+                  <span className="text-gray-700">({project.reviewCount} reviews)</span>
                 </div>
                 
                 <div className="flex items-center gap-1">
                   <Download className="w-4 h-4" />
-                  <span>{project.downloads} downloads</span>
+                  <span className="text-gray-700">{project.downloads} downloads</span>
                 </div>
                 
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
-                  <span>{new Date(project.createdAt).toLocaleDateString()}</span>
+                  <span className="text-gray-700">{new Date(project.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
             </div>
@@ -205,8 +211,8 @@ export default function ProjectDetails() {
             {/* Description */}
             <Card className="mb-6">
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Description</h2>
-                <p className="text-slate-600 leading-relaxed whitespace-pre-wrap">
+                <h2 className="text-xl font-semibold mb-4 text-blue-800">Description</h2>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                   {project.description}
                 </p>
               </CardContent>
@@ -215,11 +221,11 @@ export default function ProjectDetails() {
             {/* Technologies */}
             <Card className="mb-6">
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Technologies Used</h2>
+                <h2 className="text-xl font-semibold mb-4 text-blue-800">Technologies Used</h2>
                 <div className="flex flex-wrap gap-2">
                   {project.technologies?.map((tech: string, index: number) => (
                     <Badge key={index} variant="outline">{tech}</Badge>
-                  )) || <p className="text-slate-500">No technologies specified</p>}
+                  )) || <p className="text-gray-500">No technologies specified</p>}
                 </div>
               </CardContent>
             </Card>
@@ -227,7 +233,7 @@ export default function ProjectDetails() {
             {/* Reviews */}
             <Card>
               <CardContent className="p-6">
-                <h2 className="text-xl font-semibold mb-4">Reviews</h2>
+                <h2 className="text-xl font-semibold mb-4 text-blue-800">Reviews</h2>
                 {reviews && reviews.length > 0 ? (
                   <div className="space-y-4">
                     {reviews.map((review: any) => (
@@ -238,7 +244,7 @@ export default function ProjectDetails() {
                               {review.buyer.fullName?.charAt(0) || review.buyer.username?.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
-                          <span className="font-medium text-sm">{review.buyer.fullName || review.buyer.username}</span>
+                          <span className="font-medium text-sm text-gray-900">{review.buyer.fullName || review.buyer.username}</span>
                           <div className="flex">
                             {Array.from({ length: 5 }).map((_, i) => (
                               <Star 
@@ -247,12 +253,12 @@ export default function ProjectDetails() {
                               />
                             ))}
                           </div>
-                          <span className="text-xs text-slate-500">
+                          <span className="text-xs text-gray-600">
                             {new Date(review.createdAt).toLocaleDateString()}
                           </span>
                         </div>
                         {review.comment && (
-                          <p className="text-slate-600 text-sm">{review.comment}</p>
+                          <p className="text-gray-700 text-sm">{review.comment}</p>
                         )}
                       </div>
                     ))}
@@ -269,24 +275,24 @@ export default function ProjectDetails() {
             <Card className="sticky top-6">
               <CardContent className="p-6">
                 <div className="text-center mb-6">
-                  <div className="text-3xl font-bold text-slate-900 mb-2">
+                  <div className="text-3xl font-bold text-blue-800 mb-2">
                     ${project.price}
                   </div>
-                  <p className="text-slate-600">One-time purchase</p>
+                  <p className="text-gray-700">One-time purchase</p>
                 </div>
 
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">File Size:</span>
-                    <span className="font-medium">2.4 MB</span>
+                    <span className="text-gray-700">File Size:</span>
+                    <span className="font-medium text-gray-900">2.4 MB</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">License:</span>
-                    <span className="font-medium">Commercial</span>
+                    <span className="text-gray-700">License:</span>
+                    <span className="font-medium text-gray-900">Commercial</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Last Updated:</span>
-                    <span className="font-medium">{new Date(project.updatedAt).toLocaleDateString()}</span>
+                    <span className="text-gray-700">Last Updated:</span>
+                    <span className="font-medium text-gray-900">{new Date(project.updatedAt).toLocaleDateString()}</span>
                   </div>
                 </div>
 
@@ -327,7 +333,7 @@ export default function ProjectDetails() {
                   <Button 
                     variant="ghost" 
                     size="sm" 
-                    className="w-full text-slate-600"
+                    className="w-full text-gray-700"
                     onClick={handleReportProject}
                   >
                     <Flag className="w-4 h-4 mr-1" />
